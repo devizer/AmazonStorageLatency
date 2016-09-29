@@ -8,8 +8,8 @@
     <ProjectGuid>{2BDDED7F-A870-4262-9056-E2C6A7AD9005}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>AmazonS3Sample</RootNamespace>
-    <AssemblyName>AmazonS3Sample</AssemblyName>
+    <RootNamespace>AmazonStorageLatency</RootNamespace>
+    <AssemblyName>AmazonStorageLatency</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <IsWebBootstrapper>false</IsWebBootstrapper>

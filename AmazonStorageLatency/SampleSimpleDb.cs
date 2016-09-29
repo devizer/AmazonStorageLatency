@@ -8,7 +8,7 @@ namespace GettingStartedGuide
     using Amazon.SimpleDB;
     using Amazon.SimpleDB.Model;
 
-    using AmazonS3Sample;
+    using AmazonStorageLatency;
 
     class SampleSimpleDb
     {

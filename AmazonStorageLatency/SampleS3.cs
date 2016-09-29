@@ -1,4 +1,4 @@
-namespace AmazonS3Sample
+namespace AmazonStorageLatency
 {
     using System;
     using System.IO;

@@ -1,11 +1,13 @@
-namespace GettingStartedGuide
+namespace AmazonStorageLatency
 {
     using System;
     using System.Collections.Specialized;
     using System.Configuration;
     using System.IO;
 
-    using AmazonS3Sample;
+    using AmazonStorageLatency;
+
+    using GettingStartedGuide;
 
     class Program
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace AmazonS3Sample
+namespace AmazonStorageLatency
 {
     using System.Diagnostics;
     using System.IO;

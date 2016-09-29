@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AmazonS3Sample
+namespace AmazonStorageLatency
 {
     using Amazon;
     using Amazon.IdentityManagement;
