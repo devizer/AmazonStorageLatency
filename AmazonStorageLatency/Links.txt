@@ -1,0 +1,9 @@
+﻿DynamoDB limits:
+   http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Limits.html
+
+SimpleDB limits:
+  http://docs.aws.amazon.com/AmazonSimpleDB/latest/DeveloperGuide/SDBLimits.html
+
+IAM Limits
+  http://docs.aws.amazon.com/IAM/latest/UserGuide/reference_iam-limits.html
+  also, aws iam get-account-summary
