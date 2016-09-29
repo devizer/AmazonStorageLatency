@@ -11,4 +11,8 @@ install:
   - nuget restore $TRAVIS_SOLUTION
 script:
   - xbuild $TRAVIS_SOLUTION /t:Rebuild /p:Configuration=Release /verbosity:minimal
+  - if test "$TRAVIS_OS_NAME" == "linux"; then
+       cat /proc/cpuinfo;
+    fi
+
   
