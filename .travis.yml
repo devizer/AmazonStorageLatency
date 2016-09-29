@@ -13,7 +13,7 @@ script:
   - xbuild $TRAVIS_SOLUTION /t:Rebuild /p:Configuration=Release /verbosity:minimal
   - if test "$TRAVIS_OS_NAME" == "linux"; then
        cat /proc/cpuinfo;
-       bash travis-plugins\show-perfomance.sh 
+       bash travis-plugins\show-perfomance.sh;
     fi
 
   
