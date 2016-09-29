@@ -9,6 +9,6 @@ Q: What is latency of SimpleDB, DynamoDB, Simple Storage, Simplae Queue and AIM?
 | SimpleDB, BatchPutAttributes         |              28 ms |                 42 ms |                293 ms  |
 | S3, PutObject (new)                  |              13 ms |                 15 ms |                519 ms  |
 | S3, PutObject (update)               |              10 ms |                 25 ms |                499 ms  |
-| S3, GetObjects                       |              11 ms |                  7 ms |                307 ms  |
+| S3, GetObject                        |              11 ms |                  7 ms |                307 ms  |
 | S3, ListObjects                      |              11 ms |                 11 ms |                266 ms  |
 | S3, DeleteObjects                    |              12 ms |                 12 ms |                244 ms  |
