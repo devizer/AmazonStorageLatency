@@ -97,12 +97,17 @@
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="StackExchange.Redis, Version=1.1.605.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\StackExchange.Redis.1.1.605\lib\net45\StackExchange.Redis.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Data" />
+    <Reference Include="System.IO.Compression" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -112,6 +117,7 @@
     <Compile Include="assemblyinfo.cs" />
     <Compile Include="SampleDynamoDB.cs" />
     <Compile Include="SampleIdentity.cs" />
+    <Compile Include="SampleRedis.cs" />
     <Compile Include="SampleS3.cs" />
     <Compile Include="SampleSimpleDb.cs" />
   </ItemGroup>
