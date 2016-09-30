@@ -108,9 +108,11 @@
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.IO.Compression" />
+    <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AmazonInfo.cs" />
     <Compile Include="AwsResponseDriller.cs" />
     <Compile Include="JSonExtentions.cs" />
     <Compile Include="Program.cs" />

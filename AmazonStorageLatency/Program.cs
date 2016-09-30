@@ -30,12 +30,13 @@ namespace AmazonStorageLatency
                 catch (Exception)
                 {
                 }
-                
+
+                SampleRedis.Run();
+                continue;
                 SampleS3.Run(); 
                 SampleSimpleDb.Run();
                 SampleDynamoDB.Run();
                 SampleIdentity.Run();
-                SampleRedis.Run();
             }
 
         }

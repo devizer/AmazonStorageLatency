@@ -23,7 +23,7 @@ namespace AmazonStorageLatency
         {
             get
             {
-                var ret = ConfigurationManager.AppSettings["RedisCluster"];
+                var ret = ConfigurationManager.AppSettings["redis-asw-cluster"];
                 return ret;
             }
         }
@@ -33,11 +33,24 @@ namespace AmazonStorageLatency
         
         static SampleRedis()
         {
+            var ss = ConfigurationManager.AppSettings;
+            string m = ss["redis-local-master"];
+            string s = ss["redis-local-slave"];
+
+            if (AmazonInfo.IsAmazonOnWindows)
+            {
+                m = string.Format(ClusterEndpointFormat, 1);
+                s = string.Format(ClusterEndpointFormat, 2);
+            }
+
+            Console.WriteLine("Master redis connection: " + m);
+            Console.WriteLine("Slave  redis connection: " + s);
+
             MasterConfig = new ConfigurationOptions
             {
                 AbortOnConnectFail = false,
                 ResolveDns = true,
-                EndPoints = { string.Format(ClusterEndpointFormat, 1) },
+                EndPoints = { m },
                 ConnectTimeout = 2000
             };
 
@@ -45,7 +58,7 @@ namespace AmazonStorageLatency
             {
                 AbortOnConnectFail = false,
                 ResolveDns = true,
-                EndPoints = { string.Format(ClusterEndpointFormat, 2) },
+                EndPoints = { s },
                 ConnectTimeout = 2000
             };
         }
