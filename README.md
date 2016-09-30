@@ -12,4 +12,5 @@ Q: What is latency of SimpleDB, DynamoDB, Simple Storage, Simplae Queue and AIM?
 | S3, GetObject                        |              11 ms |                  7 ms |                307 ms  |
 | S3, ListObjects                      |              11 ms |                 11 ms |                266 ms  |
 | S3, DeleteObjects                    |              12 ms |                 12 ms |                244 ms  |
-| Redis, Replication + get             |            not yet |     2-3 (rarely 5) ms |         inappropriate  |
+| Redis, set@master                    |            not yet |   <1 (rarely 3-12) ms |         inappropriate  |
+| Redis, Replication + get@slave       |            not yet |   <1 (rarely 3-12) ms |         inappropriate  |

@@ -45,7 +45,7 @@ namespace AmazonStorageLatency
             {
                 AbortOnConnectFail = false,
                 ResolveDns = true,
-                EndPoints = { string.Format(ClusterEndpointFormat, 1) },
+                EndPoints = { string.Format(ClusterEndpointFormat, 2) },
                 ConnectTimeout = 2000
             };
         }
@@ -67,8 +67,11 @@ namespace AmazonStorageLatency
                 }
                 else
                 {
+                    // heat?
                     master.GetDatabase().StringSet(Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
-                    for (int i = 0; i < 10; i++)
+                    StringBuilder buffer = new StringBuilder();
+                    int count = 100;
+                    for (int i = 0; i <= count; i++)
                     {
                         string key = Guid.NewGuid().ToString();
                         string expected = Guid.NewGuid().ToString();
@@ -76,12 +79,12 @@ namespace AmazonStorageLatency
                         master.GetDatabase().StringSet(key, expected);
                         decimal msec = 1000m*sw.ElapsedTicks/Stopwatch.Frequency;
                         if (i==0)
-                            Console.WriteLine("Action Redis\\StringSet@Master is successeful in " + msec + " msec");
+                            buffer.AppendLine("Action Redis\\StringSet@Master is successeful in " + msec + " msec");
 
                         Stopwatch wait = Stopwatch.StartNew();
                         string actual = null;
                         long iterations = 0;
-                        while (actual == null && wait.ElapsedMilliseconds < 9000)
+                        while (actual == null && wait.ElapsedMilliseconds < 1000)
                         {
                             actual = (string) slave.GetDatabase().StringGet(key);
                             // if (actual != expected) Thread.Sleep(0);
@@ -92,11 +95,16 @@ namespace AmazonStorageLatency
                         decimal msecReplication = 1000m*ticksReplication/Stopwatch.Frequency;
                         if (actual == expected)
                         {
-                            Console.WriteLine("MASTER-SLAVE replication is succesful in {0} msec, {1} iterations", msecReplication, iterations);
+                            buffer.AppendFormat("MASTER-SLAVE replication is succesful in {0} msec, {1} iterations", msecReplication, iterations).AppendLine();
                         }
                         else
                         {
-                            Console.WriteLine("MASTER-SLAVE replication failed by timeout in {0} msec", msecReplication);
+                            buffer.AppendFormat("MASTER-SLAVE replication failed by timeout in {0} msec", msecReplication).AppendLine();
+                        }
+                        if (i%10 == 0 || i == count)
+                        {
+                            Console.WriteLine(buffer);
+                            buffer = new StringBuilder();
                         }
                     }
                 }
