@@ -1,7 +1,7 @@
 ## Amazon Storage Latency
 Q: What is latency of SimpleDB, DynamoDB, Simple Storage, Simplae Queue and AIM?
 
-|      Operation                       | US-WEST-2, 10 GBit | US-WEST-2, Moderte network   | EE                     |
+|      Operation                       | US-WEST-2, 10 GBit | US-WEST-2, Moderte network   | Home                     |
 | :-------                             |              ---:  |                 ---:  |                   ---: |
 | ping s3-us-west-2.amazonaws.com      |              <1 ms |                 <1 ms |                190 ms  |
 | DynamoDB, BatchWriteItem             |               7 ms |                 43 ms |                229 ms  |
