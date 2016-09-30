@@ -80,16 +80,19 @@ namespace AmazonStorageLatency
 
                         Stopwatch wait = Stopwatch.StartNew();
                         string actual = null;
+                        long iterations = 0;
                         while (actual == null && wait.ElapsedMilliseconds < 9000)
                         {
                             actual = (string) slave.GetDatabase().StringGet(key);
-                            if (actual != expected) Thread.Sleep(0);
+                            // if (actual != expected) Thread.Sleep(0);
+                            iterations++;
                         }
 
-                        decimal msecReplication = 1000m*sw.ElapsedTicks/Stopwatch.Frequency;
+                        var ticksReplication = wait.ElapsedTicks;
+                        decimal msecReplication = 1000m*ticksReplication/Stopwatch.Frequency;
                         if (actual == expected)
                         {
-                            Console.WriteLine("MASTER-SLAVE replication is succesful in {0} msec", msecReplication);
+                            Console.WriteLine("MASTER-SLAVE replication is succesful in {0} msec, {1} iterations", msecReplication, iterations);
                         }
                         else
                         {
