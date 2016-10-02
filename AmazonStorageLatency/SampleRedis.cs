@@ -65,18 +65,18 @@ namespace AmazonStorageLatency
 
         public static void Run()
         {
-            var log = new StringWriter();
-            using (var master = ConnectionMultiplexer.Connect(MasterConfig, log))
-            using (var slave = ConnectionMultiplexer.Connect(SlaveConfig, log))
-
+            var logMaster = new StringWriter();
+            var logSlave = new StringWriter();
+            using (var master = ConnectionMultiplexer.Connect(MasterConfig, logMaster))
+            using (var slave = ConnectionMultiplexer.Connect(SlaveConfig, logSlave))
             {
                 if (!master.IsConnected)
                 {
-                    Console.WriteLine("Redis MASTER-connection failed" + Environment.NewLine + log);
+                    Console.WriteLine("Redis MASTER-connection failed" + Environment.NewLine + logMaster + Environment.NewLine);
                 }
                 else if (!slave.IsConnected)
                 {
-                    Console.WriteLine("Redis SLAVE-connection failed" + Environment.NewLine + log);
+                    Console.WriteLine("Redis SLAVE-connection failed" + Environment.NewLine + logSlave + Environment.NewLine);
                 }
                 else
                 {
