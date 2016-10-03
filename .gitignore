@@ -252,3 +252,5 @@ paket-files/
 # JetBrains Rider
 .idea/
 *.sln.iml
+REDIS-3.0.504-x64/master/dump.rdb
+REDIS-3.0.504-x64/slave/dump.rdb
