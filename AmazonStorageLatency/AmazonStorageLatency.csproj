@@ -70,23 +70,27 @@
   </Target>
   -->
   <ItemGroup>
-    <Reference Include="AWSSDK.Core, Version=3.1.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
-      <HintPath>..\packages\AWSSDK.Core.3.1.9.2\lib\net35\AWSSDK.Core.dll</HintPath>
+    <Reference Include="AWSSDK.Core">
+      <HintPath>..\packages\AWSSDK.Core.3.3.0\lib\net45\AWSSDK.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="AWSSDK.DynamoDBv2, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
+      <HintPath>..\packages\AWSSDK.DynamoDBv2.3.3.0\lib\net45\AWSSDK.DynamoDBv2.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="AWSSDK.DynamoDBv2, Version=3.1.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
-      <HintPath>..\packages\AWSSDK.DynamoDBv2.3.1.5.3\lib\net35\AWSSDK.DynamoDBv2.dll</HintPath>
+    <Reference Include="AWSSDK.EC2, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
+      <HintPath>..\packages\AWSSDK.EC2.3.3.1\lib\net45\AWSSDK.EC2.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="AWSSDK.IdentityManagement, Version=3.1.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
-      <HintPath>..\packages\AWSSDK.IdentityManagement.3.1.4.9\lib\net45\AWSSDK.IdentityManagement.dll</HintPath>
+    <Reference Include="AWSSDK.IdentityManagement, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
+      <HintPath>..\packages\AWSSDK.IdentityManagement.3.3.0\lib\net45\AWSSDK.IdentityManagement.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="AWSSDK.S3">
-      <HintPath>..\packages\AWSSDK.S3.3.1.0.0\lib\net35\AWSSDK.S3.dll</HintPath>
+    <Reference Include="AWSSDK.S3, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
+      <HintPath>..\packages\AWSSDK.S3.3.3.0\lib\net45\AWSSDK.S3.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="AWSSDK.SimpleDB, Version=3.1.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
-      <HintPath>..\packages\AWSSDK.SimpleDB.3.1.0.9\lib\net35\AWSSDK.SimpleDB.dll</HintPath>
+    <Reference Include="AWSSDK.SimpleDB, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
+      <HintPath>..\packages\AWSSDK.SimpleDB.3.3.0\lib\net45\AWSSDK.SimpleDB.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Cucumber.SimpleDb, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -114,10 +118,12 @@
   <ItemGroup>
     <Compile Include="AmazonInfo.cs" />
     <Compile Include="AwsResponseDriller.cs" />
+    <Compile Include="DumpExtentions.cs" />
     <Compile Include="JSonExtentions.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="assemblyinfo.cs" />
     <Compile Include="SampleDynamoDB.cs" />
+    <Compile Include="SampleEC2.cs" />
     <Compile Include="SampleIdentity.cs" />
     <Compile Include="SampleRedis.cs" />
     <Compile Include="SampleS3.cs" />

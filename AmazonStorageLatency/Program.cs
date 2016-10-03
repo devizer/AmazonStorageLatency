@@ -4,6 +4,7 @@ namespace AmazonStorageLatency
     using System.Collections.Specialized;
     using System.Configuration;
     using System.IO;
+    using System.Text;
 
     using AmazonStorageLatency;
 
@@ -31,6 +32,7 @@ namespace AmazonStorageLatency
                 {
                 }
 
+                SampleEC2.Run();
                 SampleRedis.Run();
                 continue;
                 SampleS3.Run(); 

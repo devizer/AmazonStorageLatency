@@ -1,0 +1,459 @@
+Success in 00:00:00.0167374
+AmiId: ami-2827f548
+AmiLaunchIndex: 0
+AmiManifestPath: (unknown)
+AncestorAmiIds: << null >>
+Hostname: ip-172-31-23-22.us-west-2.compute.internal
+InstanceAction: none
+InstanceId: i-01b889b24b7071b67
+InstanceType: t2.micro
+KernelId: << null >>
+LocalHostname: ip-172-31-23-22.us-west-2.compute.internal
+MacAddress: 02:65:74:46:24:09
+PrivateIpAddress: 172.31.23.22
+AvailabilityZone: us-west-2b
+ProductCodes: << null >>
+PublicKey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCaUaJM3XUe9NbWMCsoI5Ak0/xoAoffI8rm6Kv/WVO3DGr5odWr99/YeAnjVhCjKYPtx6YZKkidtTpUEQuA541VjTzrkWCDArds2WyvPA5TqW0yAwjv286ECWd8esLi7ETW8D8+JHibtLlTcmGezf6G3aK22O/+9es84NRlKuCuOwSW8wMd3mqdmw7CjcbWtMTjWV5sSz4QqIWIIxnTIqkAQoedVA8OofbJ0GpExc8QBpXowGK2FWC35w4mzragc+4lrs17jcIPNA/wwIWIhhOJDoZXcR4yleJ2aNgWQI1msrsqNr9bXbo9PRNyhi/zU5uZPBVwYQsQB1RnMQZgTYo/ vlad1
+
+RamdiskId: << null >>
+ReservationId: r-02f0078b74c70cabb
+SecurityGroups: 
+   cli-sg
+
+IAMInstanceProfileInfo: << null >>
+IAMSecurityCredentials: TargetInvocationException: Exception has been thrown by the target of an invocation.
+BlockDeviceMapping: 
+   [ami, /dev/sda1]
+   [root, /dev/sda1]
+
+NetworkInterfaces: 
+   Amazon.EC2.Util.NetworkInterface
+{
+      "MacAddress": "02:65:74:46:24:09",
+      "OwnerId": "486568074266",
+      "Profile": null,
+      "LocalHostname": "ip-172-31-23-22.us-west-2.compute.internal",
+      "LocalIPv4s": [
+            "172.31.23.22"
+      ],
+      "PublicHostname": "ec2-52-40-112-242.us-west-2.compute.amazonaws.com",
+      "PublicIPv4s": [
+            "52.40.112.242"
+      ],
+      "SecurityGroups": [
+            "cli-sg"
+      ],
+      "SecurityGroupIds": [
+            "sg-3131bc57"
+      ],
+      "SubnetId": "subnet-fcec7298",
+      "SubnetIPv4CidrBlock": "172.31.16.0/20",
+      "VpcId": "vpc-912b4df5"
+}
+
+UserData: <powershell>
+Rename-computer -newname EC2Work2012R2
+
+$scripts="$($Env:SystemDrive)\On-First-Boot"
+
+function Build-WWW-Get {
+  if ($global:wget_Cache_File_FullPath) { return $global:wget_Cache_File_FullPath; }
+  $dir="$($Env:SystemDrive)\TEMP"
+  New-Item $dir -type directory -force | out-null
+'
+
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Globalization;
+using System.IO;
+using System.Net;
+using System.Threading;
+
+internal class Program
+{
+private class WReq : WebClient
+{
+protected override WebRequest GetWebRequest(Uri uri)
+{
+WebRequest w = base.GetWebRequest(uri);
+w.Timeout = 180 * 1000;
+return w;
+}
+}
+
+static Dictionary<string, List<Exception>> Errors;
+static Dictionary<string, object> Finished = new Dictionary<string, object>();
+static Stopwatch Sw = Stopwatch.StartNew();
+static Dictionary<string, long> LastProgress = new Dictionary<string, long>();
+private static string TargetDir;
+static object Sync = new object();
+
+public static int Main(string[] args)
+{
+Write("Downloader @ NET: " + Environment.Version);
+ServicePointManager.ServerCertificateValidationCallback += delegate { return true; };
+try
+{
+return Exec(args);
+}
+catch (Exception ex)
+{
+Write("Wrong arguments: " + Environment.NewLine + ex);
+return 9999;
+}
+}
+
+private static int Exec(string[] args)
+{
+TargetDir = args[0];
+try
+{
+Directory.CreateDirectory(TargetDir);
+}
+catch { }
+
+List<string> urls = new List<string>();
+for (int i = 1; i < args.Length; i++) urls.Add(args[i]);
+ServicePointManager.DefaultConnectionLimit = args.Length + 5;
+
+int retryNumer = 0;
+while (urls.Count > 0 && retryNumer < args.Length)
+{
+if (retryNumer > 0) Write("{1}RETRY: {0}", retryNumer, Environment.NewLine);
+int prev = urls.Count;
+TryDownload(urls);
+int next = urls.Count;
+retryNumer++;
+}
+
+return Errors.Count;
+}
+
+static void TryDownload(List<string> urls)
+{
+List<ManualResetEvent> dones = new List<ManualResetEvent>();
+Errors = new Dictionary<string, List<Exception>>();
+Finished = new Dictionary<string, object>();
+string n = Environment.NewLine;
+foreach (string u in urls)
+{
+string url = u;
+ManualResetEvent done = new ManualResetEvent(false);
+dones.Add(done);
+LastProgress[url] = Sw.ElapsedMilliseconds;
+
+Thread t = new Thread(delegate(object o)
+{
+Stopwatch swThis = Stopwatch.StartNew();
+Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
+string targetFile = Path.Combine(TargetDir, Path.GetFileName(url));
+try
+{
+WReq wc = new WReq();
+wc.Proxy = WebProxy.GetDefaultProxy();
+wc.DownloadProgressChanged +=
+delegate(object sender, DownloadProgressChangedEventArgs e)
+{
+long msec = Sw.ElapsedMilliseconds;
+if (msec - LastProgress[url] > 499)
+{
+string inProgress;
+lock (Sync) inProgress = string.Format("({0}/{1})", urls.Count - Finished.Count, urls.Count);
+string p = "";
+long tot = e.TotalBytesToReceive;
+long cur = e.BytesReceived;
+if (tot > 0)
+{
+double pc = (1.0 * cur / tot);
+TimeSpan eta = TimeSpan.FromSeconds(Math.Max(0,swThis.Elapsed.TotalSeconds / pc - swThis.Elapsed.TotalSeconds));
+p = string.Format(", {0:f0}% ETA {1}", pc * 100, eta);
+}
+Write("{4} {0} of {1}K{2}: {3}", cur / 1024, tot / 1024, p, Path.GetFileName(url), inProgress);
+lock (Sync) LastProgress[url] = msec;
+}
+};
+
+wc.DownloadFileCompleted += delegate(object sender, AsyncCompletedEventArgs e)
+{
+Exception err = null;
+
+if (e.Error != null)
+err = new Exception("Failed to download " + url, e.Error);
+
+if (e.Cancelled)
+{
+err = new Exception("Canceled: " + url);
+}
+if (err != null)
+{
+AddError(url, err);
+Write("FAIL: " + targetFile);
+try
+{
+File.WriteAllText(Path.GetFileNameWithoutExtension(targetFile) + ".DOWNLOAD ERROR.LOG", err.ToString());
+}
+catch
+{
+}
+try
+{
+File.Delete(targetFile);
+}
+catch
+{
+}
+}
+else
+Write("OK: {0}", url);
+
+lock (Sync) Finished[url] = null;
+done.Set();
+};
+Write("Started {0}", url);
+wc.DownloadFileAsync(new Uri(url), targetFile);
+}
+catch (Exception ex)
+{
+Exception ex2 = new Exception("Failed to ENQUEUE " + url, ex);
+AddError(url, ex2);
+Write(ex2.ToString());
+done.Set();
+}
+finally
+{
+}
+});
+t.IsBackground = true;
+t.Start();
+}
+
+Write("{0} downloads started", dones.Count);
+foreach (ManualResetEvent e in dones) e.WaitOne();
+if (Errors.Count > 0)
+{
+Write("Errors details");
+string[] sorted = new string[Errors.Keys.Count];
+Errors.Keys.CopyTo(sorted, 0);
+Array.Sort(sorted);
+foreach (string url in sorted)
+{
+Write(" **** " + url);
+foreach (Exception exception in Errors[url])
+Write(exception + n);
+
+Write("");
+}
+}
+Write("So Success: {0}, Failed: {1}", urls.Count - Errors.Count, Errors.Count);
+
+foreach (string u in Finished.Keys)
+if (!Errors.ContainsKey(u))
+urls.Remove(u);
+
+}
+
+static void Write(string msg)
+{
+lock (Sync) Console.WriteLine("{0} {1}", Sw.Elapsed, msg);
+}
+
+static void Write(string format, params object[] args)
+{
+Write(string.Format(format, args));
+}
+
+static void AddError(string url, Exception err)
+{
+lock (Sync)
+{
+List<Exception> list;
+if (!Errors.TryGetValue(url, out list))
+{
+list = new List<Exception>();
+Errors.Add(url, list);
+}
+list.Add(err);
+}
+}
+}
+
+
+
+
+
+' > "$dir\DownloadFiles.cs"
+
+  $cscParts=@("\v2.0.50727", "64\v2.0.50727", "\v4.0.30319", "64\v4.0.30319")
+  foreach($part in $cscParts) {
+    $file="$($Env:SystemDrive)\Windows\Microsoft.NET\Framework$part\Csc.exe"
+    # Write-Host "File: $file"
+    if (Test-Path $file) { $csc=$file }
+  }
+ 
+  Write-Host "CSC is $csc"
+  # /target:exe /Out:DownloadFile-net4.exe DownloadFile.cs
+  Start-Process $csc @("/target:exe", "/Out:$dir\DownloadFiles.exe", "$dir\DownloadFiles.cs") -RedirectStandardOutput "$dir\DownloadFiles.build.log" -NoNewWindow -Wait
+  $global:wget_Cache_File_FullPath="$dir\DownloadFiles.exe"
+  return $global:wget_Cache_File_FullPath;
+}
+
+$wget=Build-WWW-Get
+Write-Host "wget: <<<$wget>>>"
+"wget: <<<$wget>>>"
+
+function Is-File {
+  param ([string] $file)
+  try { return Test-Path $file.trim(); }
+  catch { return $false; }
+}
+
+function Download-File {
+  param ([string] $Uri, [string] $OutFile)
+  "Downloading $Uri to $OutFile" > "$OutFile.DOWNLOAD.log"
+  Start-Process $global:wget @($Uri, $OutFile) -NoNewWindow -Wait
+}
+
+function Download-File-Old {
+  param ([string] $Uri, [string] $OutFile)
+  "Downloading $Uri to $OutFile" > "$outfile.DOWNLOAD.log"
+  try { 
+     $clnt = new-object System.Net.WebClient
+     $clnt.DownloadFile($uri,$outfile)
+     return $true;
+  } catch { 
+    "URL: $uri downloading failed `n $($_.Exception)" >> "$outfile.DOWNLOAD ERROR.log"
+    if (Is-File($outfile)) { Remove-Item $outfile -force }
+    return $false;
+  }
+}
+
+function Expand-ZIPFile($file, $destination) {
+  $shell = new-object -com shell.application
+  $zip = $shell.NameSpace($file)
+  foreach($item in $zip.items()) {
+    $shell.Namespace($destination).copyhere($item)
+  }
+}
+
+function Disable-InternetExplorerESC {
+  $AdminKey = "HKLM:\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A7-37EF-4b3f-8CFC-4F3A74704073}"
+  $UserKey = "HKLM:\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A8-37EF-4b3f-8CFC-4F3A74704073}"
+  Set-ItemProperty -Path $AdminKey -Name "IsInstalled" -Value 0
+  Set-ItemProperty -Path $UserKey -Name "IsInstalled" -Value 0
+  Stop-Process -Name Explorer
+  Write-Host "IE Enhanced Security Configuration (ESC) has been disabled." -ForegroundColor Green
+}
+
+function Create-Desktop-ShortCut {
+  param ([string] $source, [string] $name, [string] $arguments)
+  $lnk="$($Env:USERPROFILE)\Desktop\$($name).lnk"
+  $sh = New-Object -comObject WScript.Shell
+  $Shortcut = $sh.CreateShortcut($lnk)
+  $Shortcut.TargetPath = $source
+  if ($arguments) { $Shortcut.Arguments = $arguments }
+  $Shortcut.Save()
+}
+
+New-Item $scripts -type directory -force
+Start-Transcript "$scripts\First Boot Log.log" -Force
+
+
+$url_github="https://raw.githubusercontent.com/devizer/glist/master/bin"
+$url_s3="https://s3-us-west-2.amazonaws.com/devizer-public"
+$file_advtools="AdvTools-LIGHT(Portable).exe"
+$file_vs_and_sql="SQL2016-and-VS2015WithUpdates-unattended-web-setup.zip"
+$file_NDP="NDP461-Web-Universal.exe"
+$download_list = @(
+  "$url_github/$file_advtools",
+  "$url_s3/$file_NDP",
+  "$url_s3/Git-x64.exe",
+  "$url_s3/TortoiseSVN-x64.msi",
+  "$url_s3/SQLLOCALDB-v11-x64.MSI",
+  "$url_s3/SQLLOCALDB-v12-x64.MSI",
+  "$url_s3/SQLLOCALDB-v13-x64.MSI");
+  
+
+$hasJobs=$($host.Version.Major -gt 1)
+"-------- DOWNLOAD $($download_list.Length) files ----------"
+foreach($url in $download_list) { "   - $url" }; "";
+Start-Process $wget @($scripts, "$url_s3/unzip.exe", "$url_github/$file_vs_and_sql") -NoNewWindow -RedirectStandardOutput "$scripts\downloads1 log.log" -Wait
+Start-Process $wget @($scripts, "$download_list") -NoNewWindow -RedirectStandardOutput "$scripts\downloads2 log.log" -Wait
+
+Write-Host "Stage 3"
+
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+[System.IO.Compression.ZipFile]::ExtractToDirectory("$scripts\$file_vs_and_sql", "$($Env:SystemDrive)\");
+Expand-ZipFile "$scripts\$file_vs_and_sql" "$scripts\$file_vs_and_sql"
+Start-Process "$scripts\unzip.exe" @("-o", "-d", "$($Env:SystemDrive)\", "$scripts\$file_vs_and_sql") -NoNewWindow -RedirectStandardOutput "$scripts\unzip SQL-and-VS-installers Log.log" -Wait
+
+# IE Paranoya
+# Disable-InternetExplorerESC
+# IE Home
+Set-Itemproperty -Path 'HKCU:\Software\Microsoft\Internet Explorer\Main\' -Name 'Default_Page_URL' -Value 'about:blank'
+Set-Itemproperty -Path 'HKCU:\Software\Microsoft\Internet Explorer\Main\' -Name 'First Home Page' -Value 'about:blank'
+Set-Itemproperty -Path 'HKCU:\Software\Microsoft\Internet Explorer\Main\' -Name 'Start Page' -Value 'about:blank'
+
+
+Create-Desktop-ShortCut "$($Env:SystemRoot)\system32\cttune.exe" "Clear Type Tune"
+Create-Desktop-ShortCut "$($Env:ALLUSERSPROFILE)\Start Menu\Programs\Administrative Tools" "Administrative Tools"
+Create-Desktop-ShortCut "$($Env:ALLUSERSPROFILE)\Start Menu\Programs" "Programs (all users)"
+Create-Desktop-ShortCut "$scripts\AdvTools-LIGHT(Portable).exe" "INSTALL"
+Create-Desktop-ShortCut "$scripts\$file_NDP" "NET-4.6.1 INSTALLER" "/PASSIVE /norestart /log `"$($Env:SystemDrive)\NDP461 Installer Log`""
+
+
+"INSTALL LocalDB 2012,2014,2016"
+$localdb_vers = @("v11","v12","v13")
+foreach($ver in $localdb_vers) {
+  $file="SQLLOCALDB-$ver-x64.MSI"
+  $logFile="`"$scripts\LOCALDB $ver Installer log.log`""
+  $errorFile="$scripts\LOCALDB $ver Installer ERROR CODE.log"
+  $seconds = (Measure-Command {
+    $pars=@("/i", "$scripts\$file", "IACCEPTSQLLOCALDBLICENSETERMS=YES", "/qn", "/L*v", $logFile)
+    $p=(Start-Process "msiexec" $pars -PassThru)
+    $p.WaitForExit()
+    $exitCode=$p."ExitCode"
+    if ($exitCode) { "$scripts\$file ERROR code is $exitCode" > $errorFile }
+  })."TotalSeconds"
+  "LocalDB $ver installed in $seconds seconds"
+}
+
+
+"--- GIT --- GIT --- GIT ---"
+'[Setup]
+Lang=default
+Dir=C:\Program Files\Git
+Group=Git
+NoIcons=0
+SetupType=default
+Components=icons,icons\desktop,ext,ext\shellhere,ext\guihere,assoc,assoc_sh
+Tasks=
+PathOption=CmdTools
+SSHOption=OpenSSH
+CRLFOption=CRLFAlways
+BashTerminalOption=MinTTY
+PerformanceTweaksFSCache=Enabled
+' > "$scripts\git-setup.inf"
+
+Start-Process "$scripts\Git-x64.exe" @("/VERYSILENT", "/LOG=`"$scripts\git installer log.log`"", "/NORESTART", "/LOADINF=`"$scripts\git-setup.inf`"") -Wait
+[Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\bin;", [EnvironmentVariableTarget]::Machine)
+
+"--- SVN --- SVN --- SVN ---"
+# msiexec /i TortoiseSVN-1.9.4.27285-x64-svn-1.9.4.msi ADDLOCAL=ALL,CLI /qn /norestart /L*v c:\svn2.log
+$pars=@("/i", "$scripts\TortoiseSVN-x64.msi", "ADDLOCAL=ALL,CLI", "/qn", "/L*v", "`"$scripts\TortoiseSVN installer log.log`"")
+Start-Process "msiexec" $pars -PassThru -Wait
+
+"DONE"
+
+Restart-Computer
+
+</powershell>
+<script>
+mkdir %SystemDrive%\On-First-Boot
+set > %SystemDrive%\On-First-Boot\Bootstapper-Environment.txt
+tzutil.exe /s "Belarus Standard Time"
+</script>
+
+

@@ -7,17 +7,12 @@ namespace AmazonStorageLatency
     using System.IO;
     using System.Threading;
 
-    using Amazon.Runtime;
-
     using Universe;
 
     public static class AwsResponseDriller
     {
-        private static int Counter = 0;
-
         public static TResponse ExecAws<TResponse>(this string actionName, Func<TResponse> func)
         {
-            Interlocked.Increment(ref Counter);
             Stopwatch sw = Stopwatch.StartNew();
             TResponse ret;
             DateTime startAt = DateTime.Now;
@@ -35,20 +30,8 @@ namespace AmazonStorageLatency
             long msec = sw.ElapsedMilliseconds;
             DateTime finishedAt = DateTime.Now;
 
-            string f = Path.Combine("Logs", actionName);
-            f = Path.Combine(
-                Path.GetDirectoryName(f),
-                Counter.ToString("0000") + "-" + Path.GetFileName(f)
-                );
 
-            try
-            {
-                Directory.CreateDirectory(Path.GetDirectoryName(f));
-            }
-            catch
-            {
-            }
-
+            var f = DumpExtentions.GetLogFileName(actionName);
             using (FileStream fs = new FileStream(f + ".log", FileMode.Create, FileAccess.Write, FileShare.ReadWrite))
             using (StreamWriter wr = new StreamWriter(fs, Encoding.UTF8))
             {
