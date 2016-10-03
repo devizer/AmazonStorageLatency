@@ -8,11 +8,11 @@ solution: AmazonStorageLatency.sln
 mono:
   - latest
 install:
-  - sudo apt-get install -y sysbench
   - nuget restore $TRAVIS_SOLUTION
 script:
   - xbuild $TRAVIS_SOLUTION /t:Rebuild /p:Configuration=Release /verbosity:minimal
   - if test "$TRAVIS_OS_NAME" == "linux"; then
+       sudo apt-get install -y sysbench;
        cat /proc/cpuinfo;
        bash travis-plugins/show-perfomance.sh;
     fi
