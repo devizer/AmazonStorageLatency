@@ -23,6 +23,12 @@ namespace AmazonStorageLatency
             using (StreamWriter wr = new StreamWriter(fs, Encoding.UTF8))
             {
 
+                if (!AmazonInfo.IsAmazonOnWindows)
+                {
+                    wr.WriteLine("Not an Amazon Instance on Windows");
+                    return;
+                }
+
                 Stopwatch sw = Stopwatch.StartNew();
                 try
                 {

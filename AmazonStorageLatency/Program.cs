@@ -34,7 +34,7 @@ namespace AmazonStorageLatency
 
                 SampleEC2.Run();
                 SampleRedis.Run();
-                continue;
+                // continue;
                 SampleS3.Run(); 
                 SampleSimpleDb.Run();
                 SampleDynamoDB.Run();
