@@ -1,3 +1,5 @@
+using Amazon.Runtime;
+
 namespace AmazonStorageLatency
 {
     using System;
@@ -21,7 +23,8 @@ namespace AmazonStorageLatency
         public static void Run()
         {
 
-            client = new AmazonS3Client(RegionEndpoint.USWest2);
+            AWSCredentials cred = new StoredProfileAWSCredentials(MyAwsPofile.Name);
+            client = new AmazonS3Client(cred, RegionEndpoint.USWest2);
             "S3\\ListBuckets".ExecAws(() => client.ListBuckets());
             "S3\\PutBucket".ExecAws(() => client.PutBucket(new PutBucketRequest() { BucketName = bucketName }));
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Amazon.Runtime;
 
 namespace AmazonStorageLatency
 {
@@ -14,7 +15,8 @@ namespace AmazonStorageLatency
     {
         public static void Run()
         {
-            var iam = new AmazonIdentityManagementServiceClient(RegionEndpoint.USWest2);
+            AWSCredentials cred = new StoredProfileAWSCredentials(MyAwsPofile.Name);
+            var iam = new AmazonIdentityManagementServiceClient(cred, RegionEndpoint.USWest2);
 
             "IAM\\ListAccessKeys()".ExecAws(() => iam.ListAccessKeys(new ListAccessKeysRequest()));
 

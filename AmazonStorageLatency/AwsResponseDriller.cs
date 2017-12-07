@@ -40,7 +40,7 @@ namespace AmazonStorageLatency
                 {
                     string msg = string.Format("Action {0} is successful in {1} msec.", actionName, msec);
                     wr.WriteLine(msg + " Response is:");
-                    wr.WriteLine(JSonExtentions.ToNewtonJSon(ret, true));
+                    wr.WriteLine(ret.ToNewtonJSon(true));
                     Console.WriteLine(msg);
                 }
                 else

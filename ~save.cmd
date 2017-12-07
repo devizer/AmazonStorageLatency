@@ -8,7 +8,7 @@ git pull
 
 :skip_recovery
 echo.
-echo ********** ADD --all and COMPPIT **********
+echo ********** ADD --all and COMMIT **********
 git add --all
 git commit -am "update"
 

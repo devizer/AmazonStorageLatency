@@ -118,8 +118,10 @@
   <ItemGroup>
     <Compile Include="AmazonInfo.cs" />
     <Compile Include="AwsResponseDriller.cs" />
+    <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="DumpExtentions.cs" />
     <Compile Include="JSonExtentions.cs" />
+    <Compile Include="MyAwsPofile.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="assemblyinfo.cs" />
     <Compile Include="SampleDynamoDB.cs" />

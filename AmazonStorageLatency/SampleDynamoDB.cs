@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Amazon.Runtime;
 
 namespace AmazonStorageLatency
 {
@@ -18,7 +19,9 @@ namespace AmazonStorageLatency
         {
             Stopwatch sw;
             TimeSpan elapsed;
-            AmazonDynamoDBClient client = new AmazonDynamoDBClient(RegionEndpoint.USWest2);
+
+            AWSCredentials cred = new StoredProfileAWSCredentials(MyAwsPofile.Name);
+            AmazonDynamoDBClient client = new AmazonDynamoDBClient(cred, RegionEndpoint.USWest2);
 
             var t2Response = "DynamoDB\\DescribeTable(Table2)".ExecAws(() => client.DescribeTable("Table2"));
 
@@ -39,7 +42,7 @@ namespace AmazonStorageLatency
                 { "Any_StringList", new AttributeValue() { SS = new List<string>() { "three", "two", "one"}}},
             });
 
-            req.RequestItems.GetOrCreateDefault("Table2").Add(new WriteRequest(put1));
+            req.RequestItems.GetOrCreateNew("Table2").Add(new WriteRequest(put1));
             sw = Stopwatch.StartNew();
 
             var writeBatchResponse = "DynamoDB\\BatchWriteItem".ExecAws(() => client.BatchWriteItem(req));
@@ -92,21 +95,6 @@ namespace AmazonStorageLatency
             Console.WriteLine("DynamoDB " + tableName + " CREATED in " + swCreating.ElapsedMilliseconds + " msecs");
             
             // "DynamoDB\\DeleteTable".ExecAws(() => client.DeleteTable(tableName));
-        }
-    }
-
-    public static class DictionaryExtentions
-    {
-        public static TValue GetOrCreateDefault<TKey, TValue>(this IDictionary<TKey, TValue> d, TKey key) where TValue : new ()
-        {
-            TValue value;
-            if (!d.TryGetValue(key, out value))
-            {
-                value = new TValue();
-                d[key] = value;
-            }
-
-            return value;
         }
     }
 }
