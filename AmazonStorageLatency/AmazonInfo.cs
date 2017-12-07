@@ -73,11 +73,14 @@ namespace AmazonStorageLatency
         }
         
         public static bool IsAmazonOnWindows { get { return _IsAmazonOnWindows.Value; }}
-        
-        static Lazy<bool> _IsAmazonOnWindows = new Lazy<bool>(() =>
+
+        private static Lazy<bool> _IsAmazonOnWindows = new Lazy<bool>(() =>
         {
             try
             {
+                if (Environment.OSVersion.Platform != PlatformID.Win32NT)
+                    return false;
+
                 ServiceController sc = new ServiceController("Ec2Config");
                 var status = sc.Status;
                 return true;

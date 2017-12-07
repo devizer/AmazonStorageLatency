@@ -10,7 +10,7 @@ git pull
 echo.
 echo ********** ADD --all and COMMIT **********
 git add --all
-git commit -am "update"
+git commit -am "updated"
 
 echo.
 echo **************** PUSH *********************
